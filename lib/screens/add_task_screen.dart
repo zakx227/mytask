@@ -1,142 +1,169 @@
 import 'package:flutter/material.dart';
-import 'package:mytask/Data/database_helper.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mytask/models/task_model.dart';
+import 'package:mytask/riverpod/riverpod.dart';
 
-class AddTaskScreen extends StatefulWidget {
+import 'package:mytask/widgets/my_button.dart';
+import 'package:mytask/widgets/my_inputfield.dart';
+
+class AddTaskScreen extends ConsumerStatefulWidget {
   const AddTaskScreen({super.key});
 
   @override
-  State<AddTaskScreen> createState() => _HomeScreenState();
+  ConsumerState<AddTaskScreen> createState() => _AddTaskScreenState();
 }
 
-class _HomeScreenState extends State<AddTaskScreen> {
-  DatabaseHelper data = DatabaseHelper();
+class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
+  List<String> prioriteList = ['faible', 'moyenne', 'élevée'];
+  List<String> statusList = ['à faire', 'en cours', 'termine'];
 
-  final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _dueDateController = TextEditingController();
-  final TextEditingController _priorityController = TextEditingController();
-  final TextEditingController _statusController = TextEditingController();
+  DateTime _date = DateTime.now();
+  String _statusDefaultValue = 'à faire';
+  String _prioriteDefaultValue = 'faible';
 
-  Future<void> _ajoute() async {
-    if (_formKey.currentState!.validate()) {
+  bool champRenseigne = false;
+
+  void ajoute() {
+    if (_titleController.text.isNotEmpty &&
+        _descriptionController.text.isNotEmpty) {
       Task task = Task(
         title: _titleController.text,
         description: _descriptionController.text,
-        dueDate: _dueDateController.text,
-        priority: _priorityController.text,
-        status: _statusController.text,
+        dueDate: _date.day.toString(),
+        priority: _prioriteDefaultValue,
+        status: _statusDefaultValue,
       );
-      await data.insertData(task);
+      ref.read(taskRiverpod.notifier).addTasks(task);
 
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Enregistree !')));
+      ).showSnackBar(SnackBar(content: Text('Enregistré')));
+      Navigator.pushNamed(context, '/home');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Veuillez renseigner toutes les informations',
+            style: TextStyle(color: Colors.red, fontSize: 16),
+          ),
+          backgroundColor: Colors.white,
+        ),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Column(
-        children: [
-          SizedBox(height: 50),
-          Padding(
-            padding: EdgeInsets.all(25),
-            child: Form(
-              key: _formKey,
-              child: Column(
+      backgroundColor: Colors.white,
+      appBar: AppBar(backgroundColor: Colors.white),
+      body: Container(
+        padding: EdgeInsets.only(left: 20, right: 20),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              MyInputField(
+                title: 'Task',
+                hint: 'Titre',
+                controller: _titleController,
+              ),
+              MyInputField(
+                title: 'Description',
+                hint: 'description',
+                controller: _descriptionController,
+              ),
+              MyInputField(
+                title: 'Date',
+                hint:
+                    _date.day.toString() +
+                    '/' +
+                    _date.month.toString() +
+                    '/' +
+                    _date.year.toString(),
+                widget: IconButton(
+                  onPressed: () {
+                    _getDate();
+                  },
+                  icon: Icon(Icons.calendar_today_outlined),
+                ),
+              ),
+              Row(
                 children: [
-                  TextFormField(
-                    controller: _titleController,
-                    decoration: InputDecoration(
-                      labelText: 'Titre',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                  Expanded(
+                    child: MyInputField(
+                      title: 'Status',
+                      hint: _statusDefaultValue,
+                      widget: DropdownButton(
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        iconSize: 32,
+                        underline: Container(height: 0),
+                        items:
+                            statusList.map<DropdownMenuItem<String>>((
+                              String value,
+                            ) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _statusDefaultValue = value.toString();
+                          });
+                        },
                       ),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Le titre est obligatoire";
-                      }
-                      return null;
-                    },
                   ),
-                  TextFormField(
-                    controller: _descriptionController,
-                    decoration: InputDecoration(
-                      labelText: 'Description',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: MyInputField(
+                      title: 'Priorite',
+                      hint: _prioriteDefaultValue,
+                      widget: DropdownButton(
+                        icon: Icon(Icons.keyboard_arrow_down),
+                        iconSize: 32,
+                        underline: Container(height: 0),
+                        items:
+                            prioriteList.map<DropdownMenuItem<String>>((
+                              String value,
+                            ) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            _prioriteDefaultValue = value.toString();
+                          });
+                        },
                       ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Le titre est obligatoire";
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _dueDateController,
-                    decoration: InputDecoration(
-                      labelText: 'Date',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Le titre est obligatoire";
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _priorityController,
-                    decoration: InputDecoration(
-                      labelText: 'Priority',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Le titre est obligatoire";
-                      }
-                      return null;
-                    },
-                  ),
-                  TextFormField(
-                    controller: _statusController,
-                    decoration: InputDecoration(
-                      labelText: 'Status',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                      ),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Le titre est obligatoire";
-                      }
-                      return null;
-                    },
-                  ),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _ajoute,
-                      child: const Text('Ajoute'),
                     ),
                   ),
                 ],
               ),
-            ),
+              SizedBox(height: 20),
+              MyButton(title: 'Ajoute', onPressed: ajoute),
+            ],
           ),
-        ],
+        ),
       ),
     );
+  }
+
+  _getDate() async {
+    DateTime? pickerDate = await showDatePicker(
+      context: context,
+      firstDate: DateTime(2025),
+      lastDate: DateTime(2121),
+    );
+
+    if (pickerDate != null) {
+      setState(() {
+        _date = pickerDate;
+      });
+    }
   }
 }

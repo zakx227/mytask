@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mytask/models/task_model.dart';
 import 'package:mytask/screens/add_task_screen.dart';
-import 'package:mytask/screens/home_page.dart';
+import 'package:mytask/screens/detail_task_screen.dart';
+import 'package:mytask/screens/home_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -15,10 +18,13 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/home',
       onGenerateRoute: (settings) {
+        final arguments = settings.arguments;
+
         final widget = switch (settings.name ?? "") {
           '/addtask' => AddTaskScreen(),
-
-          _ => const HomePage(),
+          '/detailtask' => DetailTaskScreen(task: arguments as Task),
+          '/home' => HomeScreen(),
+          _ => HomeScreen(),
         };
         return MaterialPageRoute(builder: (context) => widget);
       },

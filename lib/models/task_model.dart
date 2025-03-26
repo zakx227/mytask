@@ -1,18 +1,18 @@
 class Task {
   int? id;
-  String title;
-  String description;
-  String dueDate;
-  String priority;
-  String status;
+  String? title;
+  String? description;
+  String? dueDate;
+  String? priority;
+  String? status;
 
   Task({
     this.id,
-    required this.title,
-    required this.description,
-    required this.dueDate,
-    required this.priority,
-    required this.status,
+    this.title,
+    this.description,
+    this.dueDate,
+    this.priority,
+    this.status,
   });
 
   Map<String, dynamic> toMap() {
