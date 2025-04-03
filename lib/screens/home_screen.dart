@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mytask/notification.dart';
 import 'package:mytask/riverpod/provider.dart';
 import 'package:mytask/utils/constants.dart';
 

@@ -30,12 +30,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
   void ajoute() {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty) {
-      String finalDate =
-          _date.day.toString() +
-          '/' +
-          _date.month.toString() +
-          '/' +
-          _date.year.toString();
+      String finalDate = '${_date.day}/${_date.month}/${_date.year}';
 
       Task task = Task(
         title: _titleController.text,
@@ -46,13 +41,13 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
       );
       ref.read(taskNotifierProvider.notifier).addTasks(task);
 
-      //---------------------------Notification
+      //---------------------------Notification------------------------
 
       int seconds = int.tryParse(_notificationController.text) ?? 0;
       if (seconds > 0) {
-        NotificationHelper.sheduleNotification(
-          'Tache à venir',
-          'La tache ${_titleController.text} doit etre termine',
+        NotificationHelper().repeatPeriodicallyWithDurationNotification(
+          _titleController.text,
+          'body',
           seconds,
         );
       }
@@ -104,12 +99,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
               ),
               MyInputField(
                 title: 'Date',
-                hint:
-                    _date.day.toString() +
-                    '/' +
-                    _date.month.toString() +
-                    '/' +
-                    _date.year.toString(),
+                hint: '${_date.day}/${_date.month}/${_date.year}',
                 widget: IconButton(
                   onPressed: () {
                     _getDate();
