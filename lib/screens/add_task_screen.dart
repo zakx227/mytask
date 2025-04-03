@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:mytask/models/task_model.dart';
-import 'package:mytask/riverpod/riverpod.dart';
+import 'package:mytask/notification.dart';
+import 'package:mytask/riverpod/provider.dart';
+import 'package:mytask/utils/constants.dart';
 
 import 'package:mytask/widgets/my_button.dart';
 import 'package:mytask/widgets/my_inputfield.dart';
@@ -18,34 +21,59 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
   List<String> statusList = ['à faire', 'en cours', 'termine'];
 
   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _notificationController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   DateTime _date = DateTime.now();
   String _statusDefaultValue = 'à faire';
   String _prioriteDefaultValue = 'faible';
 
-  bool champRenseigne = false;
-
   void ajoute() {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty) {
+      String finalDate =
+          _date.day.toString() +
+          '/' +
+          _date.month.toString() +
+          '/' +
+          _date.year.toString();
+
       Task task = Task(
         title: _titleController.text,
         description: _descriptionController.text,
-        dueDate: _date.day.toString(),
+        dueDate: finalDate,
         priority: _prioriteDefaultValue,
         status: _statusDefaultValue,
       );
-      ref.read(taskRiverpod.notifier).addTasks(task);
+      ref.read(taskNotifierProvider.notifier).addTasks(task);
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Enregistré')));
+      //---------------------------Notification
+
+      int seconds = int.tryParse(_notificationController.text) ?? 0;
+      if (seconds > 0) {
+        NotificationHelper.sheduleNotification(
+          'Tache à venir',
+          'La tache ${_titleController.text} doit etre termine',
+          seconds,
+        );
+      }
+
+      //----------------------------------------------------------------
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Tache ajoutée avec succès !',
+            style: TextStyle(color: couleurPrincipale),
+          ),
+          backgroundColor: Colors.white,
+        ),
+      );
       Navigator.pushNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Veuillez renseigner toutes les informations',
+            'Veuillez remplir tous les champs obligatoires avant d\'ajouter la tache.',
             style: TextStyle(color: Colors.red, fontSize: 16),
           ),
           backgroundColor: Colors.white,
@@ -144,8 +172,34 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
                   ),
                 ],
               ),
+              SizedBox(height: 10),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TextFormField(
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    label: Text('Planifier Notification (facultatif)'),
+                    hintText: 'Délais (en secondes)',
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white, width: 0),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: Colors.white, width: 0),
+                    ),
+                  ),
+                  controller: _notificationController,
+                ),
+              ),
               SizedBox(height: 20),
-              MyButton(title: 'Ajoute', onPressed: ajoute),
+              MyButton(
+                title: 'Ajoute',
+                onPressed: ajoute,
+                color: couleurPrincipale,
+              ),
             ],
           ),
         ),

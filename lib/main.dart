@@ -4,8 +4,11 @@ import 'package:mytask/models/task_model.dart';
 import 'package:mytask/screens/add_task_screen.dart';
 import 'package:mytask/screens/detail_task_screen.dart';
 import 'package:mytask/screens/home_screen.dart';
+import 'package:mytask/notification.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  NotificationHelper.init();
   runApp(ProviderScope(child: MyApp()));
 }
 

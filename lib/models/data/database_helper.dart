@@ -7,14 +7,14 @@ class DatabaseHelper {
 
   Future<Database?> get db async {
     if (_db == null) {
-      _db = await _initialisation();
+      _db = await _init();
       return _db;
     }
     return _db;
   }
 
   //-----------------------------------------------------------------
-  Future<Database> _initialisation() async {
+  Future<Database> _init() async {
     String dbPath = await getDatabasesPath();
     String path = join(dbPath, "tasks.db");
 
