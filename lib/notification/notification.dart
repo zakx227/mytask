@@ -36,7 +36,7 @@ class NotificationHelper {
     );
   }
 
-  cancelAllNotifications() {
+  static cancelAllNotifications() {
     _notification.cancelAll();
   }
 
@@ -48,17 +48,17 @@ class NotificationHelper {
     int id = 0;
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
-          'repeating channel id',
-          'repeating channel name',
-          channelDescription: 'repeating description',
+          '1',
+          'Notification pour les tache',
+          channelDescription: 'Notifications',
         );
     const NotificationDetails notificationDetails = NotificationDetails(
       android: androidNotificationDetails,
     );
     await _notification.periodicallyShowWithDuration(
       id++,
-      'repeating period title',
-      'repeating period body',
+      title,
+      body,
       Duration(seconds: userDayInput),
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

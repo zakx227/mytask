@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:mytask/notification/notification.dart';
 import 'package:mytask/riverpod/provider.dart';
 import 'package:mytask/utils/constants.dart';
 
 class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+  HomeScreen({super.key});
+
+  final DateTime _date = DateTime.now();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -17,14 +21,56 @@ class HomeScreen extends ConsumerWidget {
         backgroundColor: Colors.white,
         leading: Text(''),
         title: Text(
-          'Gestion de tache',
+          'Gestion De Tache',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text(
+              'Today',
+              style: TextStyle(
+                fontSize: 20,
+                color: couleurPrincipale,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  DateFormat('yMMMMd').format(_date),
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(
+                  height: 50,
+                  width: 150,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                      ),
+                      backgroundColor: couleurPrincipale,
+                    ),
+                    onPressed: () {
+                      NotificationHelper.cancelAllNotifications();
+                    },
+                    child: Text(
+                      'Close Notif',
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20),
             Container(
               decoration: BoxDecoration(
                 border: Border.all(color: Colors.grey, width: 1),
@@ -69,7 +115,7 @@ class HomeScreen extends ConsumerWidget {
                               color:
                                   listTask[index].status != 'termine'
                                       ? const Color.fromARGB(54, 158, 158, 158)
-                                      : const Color.fromARGB(139, 76, 175, 79),
+                                      : const Color.fromARGB(35, 2, 44, 252),
                               borderRadius: BorderRadius.circular(25),
                             ),
                             child: Column(

@@ -29,7 +29,7 @@ class _DetailTaskScreenState extends ConsumerState<DetailTaskScreen> {
           child: Column(
             children: [
               MyInputField(
-                title: 'Task',
+                title: 'Tache',
                 hint: widget.task.title!,
                 widget: Container(),
               ),

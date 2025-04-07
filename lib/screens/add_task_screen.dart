@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:mytask/models/task_model.dart';
-import 'package:mytask/notification.dart';
+import 'package:mytask/notification/notification.dart';
 import 'package:mytask/riverpod/provider.dart';
 import 'package:mytask/utils/constants.dart';
-
 import 'package:mytask/widgets/my_button.dart';
 import 'package:mytask/widgets/my_inputfield.dart';
 
@@ -27,7 +25,8 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
   String _statusDefaultValue = 'à faire';
   String _prioriteDefaultValue = 'faible';
 
-  void ajoute() {
+  //----------------------Fonction Ajoute-----------------------------------
+  void add() {
     if (_titleController.text.isNotEmpty &&
         _descriptionController.text.isNotEmpty) {
       String finalDate = '${_date.day}/${_date.month}/${_date.year}';
@@ -41,19 +40,17 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
       );
       ref.read(taskNotifierProvider.notifier).addTasks(task);
 
-      //---------------------------Notification------------------------
+      //---------------------------Notification
 
       int seconds = int.tryParse(_notificationController.text) ?? 0;
       if (seconds > 0) {
         NotificationHelper().repeatPeriodicallyWithDurationNotification(
-          _titleController.text,
-          'body',
+          'Alert',
+          'La tache ${_titleController.text} doit etre termine...',
           seconds,
         );
       }
-
-      //----------------------------------------------------------------
-
+      //------------------------------------------------------------------
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -63,7 +60,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
           backgroundColor: Colors.white,
         ),
       );
-      Navigator.pushNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -76,6 +73,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
       );
     }
   }
+  //----------------------------------Fin fonction ajoute------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +86,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
           child: Column(
             children: [
               MyInputField(
-                title: 'Task',
+                title: 'Tache',
                 hint: 'Titre',
                 controller: _titleController,
               ),
@@ -173,7 +171,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
                     label: Text('Planifier Notification (facultatif)'),
-                    hintText: 'Délais (en secondes)',
+                    hintText: 'Délais (en secondes min 60)',
                     focusedBorder: UnderlineInputBorder(
                       borderSide: BorderSide(color: Colors.white, width: 0),
                     ),
@@ -187,7 +185,7 @@ class _AddTaskScreenState extends ConsumerState<AddTaskScreen> {
               SizedBox(height: 20),
               MyButton(
                 title: 'Ajoute',
-                onPressed: ajoute,
+                onPressed: add,
                 color: couleurPrincipale,
               ),
             ],

@@ -4,7 +4,7 @@ import 'package:mytask/models/task_model.dart';
 import 'package:mytask/screens/add_task_screen.dart';
 import 'package:mytask/screens/detail_task_screen.dart';
 import 'package:mytask/screens/home_screen.dart';
-import 'package:mytask/notification.dart';
+import 'package:mytask/notification/notification.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +22,6 @@ class MyApp extends StatelessWidget {
       initialRoute: '/home',
       onGenerateRoute: (settings) {
         final arguments = settings.arguments;
-
         final widget = switch (settings.name ?? "") {
           '/addtask' => AddTaskScreen(),
           '/detailtask' => DetailTaskScreen(task: arguments as Task),
